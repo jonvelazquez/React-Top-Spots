@@ -32,7 +32,7 @@ const TopSpot = ({ spot, onOpen, favorites, toggleFavorite }) => {
           {categoryIcons[category]} {category.toUpperCase()}
         </span>
       </div>
-     
+
       {/* Thumbnail and overlay star */}
       <div
         className="thumb-wrapper"
@@ -88,7 +88,7 @@ const TopSpot = ({ spot, onOpen, favorites, toggleFavorite }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
-        src={`https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=12&size=600x200&scale=2&markers=color:red|${lat},${lng}&key=${apiKey}`}
+        src={`https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=200&scaleFactor=2&center=lonlat:${lng},${lat}&zoom=12&marker=lonlat:${lng},${lat};color:%23ff0000;size:medium&apiKey=${import.meta.env.VITE_GEOAPIFY_KEY}`}
         alt={name}
         className="topspot-map"
       />

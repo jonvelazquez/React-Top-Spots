@@ -104,7 +104,7 @@ const App = () => {
         return saved ? JSON.parse(saved) : [];
       }
     } catch (err) {
-      
+
     }
     return [];
   };
@@ -126,7 +126,7 @@ const App = () => {
           window.localStorage.setItem("favorites", JSON.stringify(updated));
         }
       } catch (err) {
-        
+
       }
 
       return updated;
@@ -148,8 +148,7 @@ const App = () => {
   const pageSize = 10;
 
   useEffect(() => {
-    axios
-      .get("https://ccc.helloworldbox.com/items/top_spots")
+    axios.get("http://localhost:3000/api/topspots")
       .then((res) => res.data.data)
       .then((data) => {
         const enriched = data.map((spot) => ({
@@ -162,29 +161,68 @@ const App = () => {
       .catch(() => setError("Failed to load top spots"))
       .finally(() => setLoading(false));
   }, []);
+  useEffect(() => {
+    axios.get("http://127.0.0.1:3000/api/topspots")
+      .then((res) => {
+        console.log("API response:", res.data);
+        return res.data.data;
+      })
+      .then((data) => {
+        console.log("Mapped data:", data);
+        const enriched = data.map((spot) => ({
+          ...spot,
+          category: determineCategory(spot),
+          imageUrl: locationImages[spot.id] || null
+        }));
+        setTopspots(enriched);
+      })
+      .catch((err) => {
+        console.error("Axios error:", err);
+        setError("Failed to load top spots");
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
+  useEffect(() => {
+    axios.get("/api/topspots").then((res) => {
+      const enriched = res.data.data.map((spot) => ({
+        ...spot,
+        category: determineCategory(spot)
+      }));
+      setTopspots(enriched);
+    });
+  }, []);
+
+  // 1. Search filter
   const filtered = topspots.filter((spot) =>
     spot.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // 2. Category filter
   const categoryFiltered = filtered.filter(
     (spot) => category === "all" || spot.category === category
   );
 
+  // 3. Sort
   const sorted = [...categoryFiltered].sort((a, b) => {
     if (sort === "name") return a.name.localeCompare(b.name);
     if (sort === "id") return a.id - b.id;
     return 0;
   });
 
-  let finalList = sorted;
+  // 4. Pagination (LAST)
   const start = (page - 1) * pageSize;
+  const paginated = sorted.slice(start, start + pageSize);
 
-  const favoriteSpots = sorted.filter((spot) =>
+  // Final list for UI
+  let finalList = paginated;
+
+  // Favorites (optional: paginated)
+  const favoriteSpots = paginated.filter((spot) =>
     favorites.includes(String(spot.id))
   );
 
@@ -209,7 +247,7 @@ const App = () => {
           >
             {showFavoritesPage ? "Back to All Spots" : "View Favorites"}
           </button>
-          
+
           <span className="favorites-count"> {favorites.length} Favorites Saved</span>
         </div>
       </div>

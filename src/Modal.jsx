@@ -6,8 +6,6 @@ const Modal = ({ spot, onClose, favorites, toggleFavorite }) => {
     const { name, description, location, imageUrl } = spot;
     const [lat, lng] = location;
 
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
-
     // Swipeable gallery
     const images = [imageUrl];
     const [galleryIndex, setGalleryIndex] = useState(0);
@@ -91,15 +89,13 @@ const Modal = ({ spot, onClose, favorites, toggleFavorite }) => {
                     />
                 </div>
 
-                {/* Map */}
                 <img
-                    src={`https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=600x300&scale=2&markers=color:red|${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_KEY}`}
+                    src={`https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=300&scaleFactor=2&center=lonlat:${lng},${lat}&zoom=15&marker=lonlat:${lng},${lat};color:%23ff0000;size:medium&apiKey=${import.meta.env.VITE_GEOAPIFY_KEY}`}
                     alt="Map"
+                    className="modal-map"
                     loading="lazy"
                     decoding="async"
-                    className="modal-map"
                 />
-
 
                 <p className="map-caption">Location on map</p>
 
